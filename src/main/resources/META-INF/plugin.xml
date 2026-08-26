@@ -36,5 +36,6 @@
             implementationClass="dev.gaphunter.prometheusmetricnamingcompanion.gutter.MetricNamingLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="kotlin"
             implementationClass="dev.gaphunter.prometheusmetricnamingcompanion.gutter.MetricNamingLineMarkerProvider"/>
+        <notificationGroup id="Prometheus Metric Naming Companion" displayType="BALLOON"/>
     </extensions>
 </idea-plugin>
