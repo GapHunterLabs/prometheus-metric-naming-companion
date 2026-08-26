@@ -9,6 +9,7 @@ import dev.gaphunter.prometheusmetricnamingcompanion.detect.JavaMetricFinder
 import dev.gaphunter.prometheusmetricnamingcompanion.detect.KotlinMetricFinder
 import dev.gaphunter.prometheusmetricnamingcompanion.model.MetricHit
 import dev.gaphunter.prometheusmetricnamingcompanion.model.NamingProblem
+import dev.gaphunter.prometheusmetricnamingcompanion.review.ReviewPrompt
 
 class MetricNamingLineMarkerProvider : LineMarkerProviderDescriptor(), DumbAware {
 
@@ -29,6 +30,10 @@ class MetricNamingLineMarkerProvider : LineMarkerProviderDescriptor(), DumbAware
         for (element in elements) {
             val hit = leafByHit[element] ?: continue
             result.add(buildMarker(element, hit))
+
+            val path = file.virtualFile?.path ?: continue
+            val lineNumber = file.viewProvider.document?.getLineNumber(element.textRange.startOffset) ?: -1
+            ReviewPrompt.recordHit(file.project, "$path:$lineNumber")
         }
     }
 
