@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 
+## [0.2.0]
+
+### Added
+
+- New rule: a Histogram/Summary metric name manually carrying
+  `_bucket`/`_count`/`_sum` is now flagged -- the client library
+  appends these suffixes itself when exposing the metric, so a
+  manually-added one produces a broken/duplicated name at scrape time.
+
 ## [0.1.1]
 
 ### Added
@@ -26,6 +35,7 @@
 - 100% static PSI analysis, Java and Kotlin, no network calls, no
   telemetry. Free.
 
-[Unreleased]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/compare/0.1.1...HEAD
+[Unreleased]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/compare/0.2.0...HEAD
+[0.2.0]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/compare/0.1.1...0.2.0
 [0.1.1]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/commits/0.1.0

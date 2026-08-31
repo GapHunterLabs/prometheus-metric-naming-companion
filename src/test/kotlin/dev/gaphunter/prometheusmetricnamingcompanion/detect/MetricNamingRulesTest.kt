@@ -24,6 +24,42 @@ class MetricNamingRulesTest {
     }
 
     @Test
+    fun `a well-formed histogram name has no problem`() {
+        assertNull(MetricNamingRules.firstProblem(MetricKind.HISTOGRAM, "request_duration_seconds"))
+    }
+
+    @Test
+    fun `a histogram name manually carrying the _bucket suffix is flagged`() {
+        assertEquals(
+            NamingProblem.HISTOGRAM_OR_SUMMARY_RESERVED_SUFFIX,
+            MetricNamingRules.firstProblem(MetricKind.HISTOGRAM, "request_duration_seconds_bucket"),
+        )
+    }
+
+    @Test
+    fun `a summary name manually carrying the _sum suffix is flagged`() {
+        assertEquals(
+            NamingProblem.HISTOGRAM_OR_SUMMARY_RESERVED_SUFFIX,
+            MetricNamingRules.firstProblem(MetricKind.SUMMARY, "request_duration_seconds_sum"),
+        )
+    }
+
+    @Test
+    fun `a summary name manually carrying the _count suffix is flagged`() {
+        assertEquals(
+            NamingProblem.HISTOGRAM_OR_SUMMARY_RESERVED_SUFFIX,
+            MetricNamingRules.firstProblem(MetricKind.SUMMARY, "request_duration_seconds_count"),
+        )
+    }
+
+    @Test
+    fun `a counter is never flagged for the histogram-summary reserved suffix rule`() {
+        // "_count" happens to end a valid counter-shaped name too -- the
+        // reserved-suffix rule only ever applies to Histogram/Summary.
+        assertNull(MetricNamingRules.firstProblem(MetricKind.COUNTER, "requests_count_total"))
+    }
+
+    @Test
     fun `a camelCase name is flagged as not snake_case before the suffix check`() {
         assertEquals(NamingProblem.NOT_SNAKE_CASE, MetricNamingRules.firstProblem(MetricKind.COUNTER, "httpRequests"))
     }

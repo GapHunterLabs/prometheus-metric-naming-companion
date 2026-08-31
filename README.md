@@ -21,10 +21,13 @@ after a dashboard goes dark.
 - **100% static PSI analysis** — matches by simple class/method name
   only, works whether the real Prometheus/Micrometer jar is on the
   classpath or not. Java and Kotlin.
-- **Only 2 real, spec-documented rules checked**, not an opinionated
-  invented convention: lowercase snake_case, and a counter's `_total`
-  suffix — both cited directly in Prometheus's own naming
-  documentation.
+- **Only 3 real, spec-documented rules checked**, not an opinionated
+  invented convention: lowercase snake_case, a counter's `_total`
+  suffix, and a Histogram/Summary's name never manually carrying
+  `_bucket`/`_count`/`_sum` (the client library appends those itself
+  when exposing the metric — a manually-added one produces a broken/
+  duplicated name at scrape time) — all three cited directly in
+  Prometheus's own naming documentation.
 
 ## v0.1 scope — stated honestly, not exhaustively
 

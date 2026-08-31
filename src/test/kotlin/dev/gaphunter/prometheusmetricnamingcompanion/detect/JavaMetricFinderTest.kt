@@ -94,4 +94,34 @@ class JavaMetricFinderTest : BasePlatformTestCase() {
         )
         assertTrue(JavaMetricFinder.findAll(file).isEmpty())
     }
+
+    fun `test a Histogram name manually carrying the _bucket suffix is flagged`() {
+        val file = myFixture.configureByText(
+            "Metrics.java",
+            """
+            class Metrics {
+                void init() {
+                    Histogram.build("request_duration_seconds_bucket", "help").register();
+                }
+            }
+            """.trimIndent(),
+        )
+        val hits = JavaMetricFinder.findAll(file)
+        assertEquals(1, hits.size)
+        assertEquals(NamingProblem.HISTOGRAM_OR_SUMMARY_RESERVED_SUFFIX, hits[0].problem)
+    }
+
+    fun `test a well-formed Histogram name is not flagged`() {
+        val file = myFixture.configureByText(
+            "Metrics.java",
+            """
+            class Metrics {
+                void init() {
+                    Histogram.build("request_duration_seconds", "help").register();
+                }
+            }
+            """.trimIndent(),
+        )
+        assertTrue(JavaMetricFinder.findAll(file).isEmpty())
+    }
 }
