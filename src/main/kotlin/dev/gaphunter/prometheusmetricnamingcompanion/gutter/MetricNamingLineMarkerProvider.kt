@@ -55,6 +55,8 @@ class MetricNamingLineMarkerProvider : LineMarkerProviderDescriptor(), DumbAware
             "Metric name \"${hit.metricName}\" should be lowercase snake_case per Prometheus naming conventions (e.g. \"http_requests_total\")"
         NamingProblem.COUNTER_MISSING_TOTAL_SUFFIX ->
             "Counter metric name \"${hit.metricName}\" should end in \"_total\" per Prometheus naming conventions"
+        NamingProblem.HISTOGRAM_OR_SUMMARY_RESERVED_SUFFIX ->
+            "Metric name \"${hit.metricName}\" must not manually carry a \"_bucket\"/\"_count\"/\"_sum\" suffix -- the client library appends these itself for a Histogram/Summary, so this name would be exposed with a broken/duplicated suffix at scrape time"
     }
 
     /** Leaf-anchored, never a composite node. */

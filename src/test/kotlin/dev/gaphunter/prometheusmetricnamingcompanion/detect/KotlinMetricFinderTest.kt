@@ -65,6 +65,36 @@ class KotlinMetricFinderTest : BasePlatformTestCase() {
         assertTrue(KotlinMetricFinder.findAll(file).isEmpty())
     }
 
+    fun `test a Histogram name manually carrying the _bucket suffix is flagged`() {
+        val file = myFixture.configureByText(
+            "Metrics.kt",
+            """
+            class Metrics {
+                fun init() {
+                    Histogram.builder("request_duration_seconds_bucket").register(registry)
+                }
+            }
+            """.trimIndent(),
+        )
+        val hits = KotlinMetricFinder.findAll(file)
+        assertEquals(1, hits.size)
+        assertEquals(NamingProblem.HISTOGRAM_OR_SUMMARY_RESERVED_SUFFIX, hits[0].problem)
+    }
+
+    fun `test a well-formed Histogram name is not flagged`() {
+        val file = myFixture.configureByText(
+            "Metrics.kt",
+            """
+            class Metrics {
+                fun init() {
+                    Histogram.builder("request_duration_seconds").register(registry)
+                }
+            }
+            """.trimIndent(),
+        )
+        assertTrue(KotlinMetricFinder.findAll(file).isEmpty())
+    }
+
     fun `test an unrelated call is never flagged`() {
         val file = myFixture.configureByText(
             "Metrics.kt",
