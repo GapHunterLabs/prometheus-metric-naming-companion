@@ -4,6 +4,16 @@
 
 ## [Unreleased]
 
+## [0.2.1]
+
+### Fixed
+
+- Marketplace listing (`plugin.xml`) still only mentioned 2 of the 3
+  real checks ("lowercase snake_case" and the counter `_total` suffix)
+  -- stale since 0.2.0 added the Histogram/Summary
+  `_bucket`/`_count`/`_sum` rule. README already listed all 3;
+  `plugin.xml` now matches.
+
 ## [0.2.0]
 
 ### Added
@@ -35,7 +45,8 @@
 - 100% static PSI analysis, Java and Kotlin, no network calls, no
   telemetry. Free.
 
-[Unreleased]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/compare/0.2.1...HEAD
+[0.2.1]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/compare/0.1.1...0.2.0
 [0.1.1]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/commits/0.1.0

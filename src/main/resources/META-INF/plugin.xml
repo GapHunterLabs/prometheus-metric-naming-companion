@@ -11,12 +11,17 @@
         client's <code>Counter.build("name", "help")</code> and
         Micrometer's <code>Counter.builder("name")</code> (same for
         Gauge/Histogram/Summary/Timer).</p>
-        <p>Checks: the name should be lowercase snake_case, and a
-        counter's name should end in <code>_total</code>.</p>
+        <p>Checks: the name should be lowercase snake_case, a
+        counter's name should end in <code>_total</code>, and a
+        Histogram/Summary's name should never manually carry
+        <code>_bucket</code>/<code>_count</code>/<code>_sum</code> (the
+        client library appends those itself when exposing the metric).
+        All three cited directly in Prometheus's own naming
+        documentation.</p>
         <p><b>100% static PSI analysis</b> -- matches by simple class/
         method name only, works whether the real Prometheus/Micrometer
         jar is on the classpath or not. Java and Kotlin.</p>
-        <p>Stated honestly: v0.1 only checks the name literal passed
+        <p>Stated honestly: only checks the name literal passed
         directly to <code>build(...)</code>/<code>builder(...)</code> --
         the Prometheus client's alternate chained form
         (<code>Counter.build().name("x")</code>) isn't covered yet.</p>
