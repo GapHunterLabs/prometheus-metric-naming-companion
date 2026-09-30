@@ -18,6 +18,12 @@
         client library appends those itself when exposing the metric).
         All three cited directly in Prometheus's own naming
         documentation.</p>
+        <p>Micrometer names follow Micrometer's own convention:
+        lowercase words separated by dots (<code>http.server.requests</code>),
+        with no <code>_total</code> required -- its Prometheus registry
+        converts the name and the Prometheus client adds <code>_total</code>
+        to counters itself. Only an uppercase/camelCase Micrometer name is
+        reported.</p>
         <p><b>100% static PSI analysis</b> -- matches by simple class/
         method name only, works whether the real Prometheus/Micrometer
         jar is on the classpath or not. Java and Kotlin.</p>

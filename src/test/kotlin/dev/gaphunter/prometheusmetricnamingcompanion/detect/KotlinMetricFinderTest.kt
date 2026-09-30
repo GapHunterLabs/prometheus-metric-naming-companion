@@ -19,13 +19,13 @@ class KotlinMetricFinderTest : BasePlatformTestCase() {
         assertTrue(KotlinMetricFinder.findAll(file).isEmpty())
     }
 
-    fun `test a counter missing the _total suffix is flagged`() {
+    fun `test a Prometheus client counter missing the _total suffix is flagged`() {
         val file = myFixture.configureByText(
             "Metrics.kt",
             """
             class Metrics {
                 fun init() {
-                    Counter.builder("http_requests").register(registry)
+                    Counter.build("http_requests", "Requests").register()
                 }
             }
             """.trimIndent(),
@@ -35,7 +35,22 @@ class KotlinMetricFinderTest : BasePlatformTestCase() {
         assertEquals(NamingProblem.COUNTER_MISSING_TOTAL_SUFFIX, hits[0].problem)
     }
 
-    fun `test a camelCase name is flagged as not snake_case`() {
+    fun `test a Micrometer counter is not asked for _total -- the Prometheus registry adds it`() {
+        val file = myFixture.configureByText(
+            "Metrics.kt",
+            """
+            class Metrics {
+                fun init() {
+                    Counter.builder("http_requests").register(registry)
+                    Counter.builder("orders.created").register(registry)
+                }
+            }
+            """.trimIndent(),
+        )
+        assertTrue(KotlinMetricFinder.findAll(file).isEmpty())
+    }
+
+    fun `test a camelCase Micrometer name is flagged with the Micrometer convention`() {
         val file = myFixture.configureByText(
             "Metrics.kt",
             """
@@ -48,7 +63,7 @@ class KotlinMetricFinderTest : BasePlatformTestCase() {
         )
         val hits = KotlinMetricFinder.findAll(file)
         assertEquals(1, hits.size)
-        assertEquals(NamingProblem.NOT_SNAKE_CASE, hits[0].problem)
+        assertEquals(NamingProblem.MICROMETER_NOT_LOWERCASE, hits[0].problem)
     }
 
     fun `test an interpolated metric name is never checked -- v0-1 documented scope limit`() {

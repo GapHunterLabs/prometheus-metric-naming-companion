@@ -28,6 +28,13 @@ after a dashboard goes dark.
   when exposing the metric — a manually-added one produces a broken/
   duplicated name at scrape time) — all three cited directly in
   Prometheus's own naming documentation.
+- **Micrometer names follow Micrometer's convention, not Prometheus's.**
+  Micrometer documents lowercase words separated by dots
+  (`http.server.requests`), and its Prometheus registry turns them into
+  snake_case and leaves `_total` to the Prometheus client, which adds
+  it itself. So `Counter.builder("orders.created")` is fine; only an
+  uppercase/camelCase Micrometer name (and a manual
+  `_bucket`/`_count`/`_sum`) is reported.
 
 ## v0.1 scope — stated honestly, not exhaustively
 

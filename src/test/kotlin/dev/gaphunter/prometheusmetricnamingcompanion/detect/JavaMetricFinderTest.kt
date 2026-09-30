@@ -35,20 +35,36 @@ class JavaMetricFinderTest : BasePlatformTestCase() {
         assertEquals(NamingProblem.COUNTER_MISSING_TOTAL_SUFFIX, hits[0].problem)
     }
 
-    fun `test Micrometer Counter-builder is also recognized`() {
+    fun `test Micrometer Counter-builder is also recognized, with Micrometer's own convention`() {
         val file = myFixture.configureByText(
             "Metrics.java",
             """
             class Metrics {
                 void init() {
-                    Counter.builder("http_requests").register(registry);
+                    Counter.builder("httpRequests").register(registry);
                 }
             }
             """.trimIndent(),
         )
         val hits = JavaMetricFinder.findAll(file)
         assertEquals(1, hits.size)
-        assertEquals(NamingProblem.COUNTER_MISSING_TOTAL_SUFFIX, hits[0].problem)
+        assertEquals(NamingProblem.MICROMETER_NOT_LOWERCASE, hits[0].problem)
+    }
+
+    fun `test Micrometer dotted names and counters without _total are not flagged`() {
+        val file = myFixture.configureByText(
+            "Metrics.java",
+            """
+            class Metrics {
+                void init() {
+                    Counter.builder("http.server.requests").register(registry);
+                    Counter.builder("orders_created").register(registry);
+                    Timer.builder("checkout.duration").register(registry);
+                }
+            }
+            """.trimIndent(),
+        )
+        assertTrue(JavaMetricFinder.findAll(file).isEmpty())
     }
 
     fun `test a camelCase name is flagged as not snake_case`() {

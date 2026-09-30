@@ -1,5 +1,6 @@
 package dev.gaphunter.prometheusmetricnamingcompanion.detect
 
+import dev.gaphunter.prometheusmetricnamingcompanion.model.MetricApi
 import dev.gaphunter.prometheusmetricnamingcompanion.model.MetricKind
 import dev.gaphunter.prometheusmetricnamingcompanion.model.NamingProblem
 import org.junit.Assert.assertEquals
@@ -7,6 +8,51 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class MetricNamingRulesTest {
+
+    // Micrometer: lowercase dot notation is its documented convention, and its Prometheus registry leaves "_total"
+    // to the Prometheus client, which appends it itself.
+
+    @Test
+    fun `a Micrometer dotted name has no problem`() {
+        assertNull(MetricNamingRules.firstProblem(MetricKind.COUNTER, "http.server.requests", MetricApi.MICROMETER))
+        assertNull(MetricNamingRules.firstProblem(MetricKind.TIMER, "checkout.duration", MetricApi.MICROMETER))
+    }
+
+    @Test
+    fun `a Micrometer counter is never asked for the _total suffix`() {
+        assertNull(MetricNamingRules.firstProblem(MetricKind.COUNTER, "orders_created", MetricApi.MICROMETER))
+    }
+
+    @Test
+    fun `a camelCase or uppercase Micrometer name is flagged with the Micrometer rule`() {
+        assertEquals(NamingProblem.MICROMETER_NOT_LOWERCASE,
+            MetricNamingRules.firstProblem(MetricKind.GAUGE, "activeSessions", MetricApi.MICROMETER))
+        assertEquals(NamingProblem.MICROMETER_NOT_LOWERCASE,
+            MetricNamingRules.firstProblem(MetricKind.COUNTER, "HTTP.requests", MetricApi.MICROMETER))
+        assertEquals(NamingProblem.MICROMETER_NOT_LOWERCASE,
+            MetricNamingRules.firstProblem(MetricKind.COUNTER, "orders..created", MetricApi.MICROMETER))
+    }
+
+    @Test
+    fun `a Micrometer histogram name carrying a reserved suffix is still flagged, dots included`() {
+        assertEquals(NamingProblem.HISTOGRAM_OR_SUMMARY_RESERVED_SUFFIX,
+            MetricNamingRules.firstProblem(MetricKind.HISTOGRAM, "request.duration.bucket", MetricApi.MICROMETER))
+    }
+
+    @Test
+    fun `the Prometheus client keeps its three rules`() {
+        assertEquals(NamingProblem.NOT_SNAKE_CASE,
+            MetricNamingRules.firstProblem(MetricKind.COUNTER, "http.server.requests", MetricApi.PROMETHEUS_CLIENT))
+        assertEquals(NamingProblem.COUNTER_MISSING_TOTAL_SUFFIX,
+            MetricNamingRules.firstProblem(MetricKind.COUNTER, "orders_created", MetricApi.PROMETHEUS_CLIENT))
+    }
+
+    @Test
+    fun `the call shape tells the two APIs apart`() {
+        assertEquals(MetricApi.PROMETHEUS_CLIENT, MetricApi.byConstructorName("build"))
+        assertEquals(MetricApi.MICROMETER, MetricApi.byConstructorName("builder"))
+        assertNull(MetricApi.byConstructorName("register"))
+    }
 
     @Test
     fun `a well-formed counter name has no problem`() {
