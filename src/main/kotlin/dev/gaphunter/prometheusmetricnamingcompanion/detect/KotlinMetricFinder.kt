@@ -1,6 +1,7 @@
 package dev.gaphunter.prometheusmetricnamingcompanion.detect
 
 import com.intellij.psi.PsiFile
+import dev.gaphunter.prometheusmetricnamingcompanion.model.MetricApi
 import dev.gaphunter.prometheusmetricnamingcompanion.model.MetricHit
 import dev.gaphunter.prometheusmetricnamingcompanion.model.MetricKind
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -34,11 +35,12 @@ object KotlinMetricFinder {
         val call = expression.selectorExpression as? KtCallExpression ?: return null
         val methodName = (call.calleeExpression as? KtNameReferenceExpression)?.getReferencedName() ?: return null
         if (methodName !in CONSTRUCTOR_METHODS) return null
+        val api = MetricApi.byConstructorName(methodName) ?: return null
 
         val firstArgExpr = call.valueArguments.firstOrNull()?.getArgumentExpression() as? KtStringTemplateExpression ?: return null
         val name = plainLiteralTextOf(firstArgExpr) ?: return null
 
-        val problem = MetricNamingRules.firstProblem(kind, name) ?: return null
+        val problem = MetricNamingRules.firstProblem(kind, name, api) ?: return null
         return MetricHit(firstArgExpr, name, problem)
     }
 

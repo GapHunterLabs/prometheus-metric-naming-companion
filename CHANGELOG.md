@@ -4,6 +4,20 @@
 
 ## [Unreleased]
 
+## [0.2.3]
+
+### Fixed
+
+- Micrometer meters are checked against Micrometer's naming
+  convention, not Prometheus's. `Counter.builder("orders.created")`
+  (lowercase words separated by dots, the style Micrometer documents)
+  was flagged as not snake_case, and a Micrometer counter was told to
+  end in `_total`, which its Prometheus registry leaves to the
+  Prometheus client (it appends `_total` itself and rejects a name that
+  already has it). Now only an uppercase/camelCase Micrometer name, or
+  a manual `_bucket`/`_count`/`_sum`, is reported. The Prometheus Java
+  client's `Counter.build("name", "help")` keeps its three rules.
+
 ## [0.2.2]
 
 ### Fixed
@@ -52,7 +66,8 @@
 - 100% static PSI analysis, Java and Kotlin, no network calls, no
   telemetry. Free.
 
-[Unreleased]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/compare/0.2.2...HEAD
+[Unreleased]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/compare/0.2.3...HEAD
+[0.2.3]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/compare/0.2.2...0.2.3
 [0.2.2]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/compare/0.2.1...0.2.2
 [0.2.1]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/GapHunterLabs/prometheus-metric-naming-companion/compare/0.1.1...0.2.0

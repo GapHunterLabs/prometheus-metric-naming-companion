@@ -5,6 +5,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiReferenceExpression
+import dev.gaphunter.prometheusmetricnamingcompanion.model.MetricApi
 import dev.gaphunter.prometheusmetricnamingcompanion.model.MetricHit
 import dev.gaphunter.prometheusmetricnamingcompanion.model.MetricKind
 
@@ -40,6 +41,7 @@ object JavaMetricFinder {
     private fun hitFor(call: PsiMethodCallExpression): MetricHit? {
         val methodName = call.methodExpression.referenceName ?: return null
         if (methodName !in CONSTRUCTOR_METHODS) return null
+        val api = MetricApi.byConstructorName(methodName) ?: return null
 
         val qualifierName = (call.methodExpression.qualifierExpression as? PsiReferenceExpression)?.referenceName ?: return null
         val kind = MetricKind.byBuilderName(qualifierName) ?: return null
@@ -47,7 +49,7 @@ object JavaMetricFinder {
         val firstArg = call.argumentList.expressions.firstOrNull() as? PsiLiteralExpression ?: return null
         val name = firstArg.value as? String ?: return null
 
-        val problem = MetricNamingRules.firstProblem(kind, name) ?: return null
+        val problem = MetricNamingRules.firstProblem(kind, name, api) ?: return null
         return MetricHit(firstArg, name, problem)
     }
 }
