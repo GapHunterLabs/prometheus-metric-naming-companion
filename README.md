@@ -7,6 +7,12 @@ real registration shapes: the Prometheus Java client's
 `Counter.build("name", "help")` and Micrometer's
 `Counter.builder("name")` (same for Gauge/Histogram/Summary/Timer).
 
+![Prometheus Metric Naming Companion: catch metric names that break Prometheus or Micrometer naming rules](docs/media/hero.gif)
+
+Each feature on its own:
+[Prometheus client names](docs/media/01-prometheus-client.gif) ·
+[Micrometer names](docs/media/02-micrometer.gif)
+
 ## Why it exists
 
 A metric name typo or convention violation ships silently — nothing
