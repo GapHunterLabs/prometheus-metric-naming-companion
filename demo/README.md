@@ -11,4 +11,7 @@
    metric names but not the third.
 
 The GIFs in `docs/media/` show the same checks, plus Micrometer's own
-naming convention (dot-separated lowercase names, no unit suffixes).
+naming convention: lowercase, dot-separated names, where a missing
+`_total` is correct (the Prometheus registry adds it) and only an
+uppercase/camelCase name or a manual `_bucket`/`_count`/`_sum` is
+reported.
